@@ -1,5 +1,5 @@
 # Pipe Dream
-Boilerplate for a Phoenix (and optional Elm) app
+Boilerplate for a Phoenix and Elm app
 
 To start your Phoenix server:
 
