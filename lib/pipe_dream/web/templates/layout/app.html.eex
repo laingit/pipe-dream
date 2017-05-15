@@ -18,8 +18,9 @@
       <%= render @view_module, @view_template, assigns %>
     </main>
 
-    <!-- uncomment below to add elm runtime  -->
+    <!-- comment this line out to remove elm app  -->
     <script src="<%= static_path(@conn, "/js/elm.js") %>"></script>
+
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>
