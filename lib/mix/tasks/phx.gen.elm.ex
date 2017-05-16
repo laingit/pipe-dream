@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
 
 
     3. in your 'layout' template ('/lib/#{app_name}/web/templates/layout/app.html.eex')
-    add the following to embed the elm-runtime (above 'app.js')
+    add the following to embed your elm app and the elm-runtime (above 'app.js')
 
 
         <script src="<%= static_path(@conn, "/js/elm.js") %>"></script>
