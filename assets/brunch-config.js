@@ -61,12 +61,6 @@ exports.config = {
         require('postcss-custom-media')(),
         require('postcss-custom-properties')()
       ]
-    },
-
-    elmBrunch: {
-      mainModules: ['./elm/Main.elm'],
-      outputFile: 'elm.js',
-      makeParameters: ['--debug']
     }
   },
 
