@@ -41,8 +41,7 @@ exports.config = {
     watched: [
       "static",
       "css",
-      "js",
-      "elm"
+      "js"
     ],
     // Where to compile files to
     public: "../priv/static"

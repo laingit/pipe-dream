@@ -15,7 +15,7 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
 
     🎉 ✨  Your elm app is almost ready to go! ✨ 🎉
 
-    add the following to the 'plugins' section of your brunch-config.js
+    1. add the following to the 'plugins' section of your brunch-config.js
 
 
         elmBrunch: {
@@ -24,15 +24,17 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
           makeParameters: ['--debug'] // activates time travel debugger
         }
 
+    2. add 'elm' to the 'watched' array in your brunch-config.js
 
-    in your 'layout' template ('/lib/#{app_name}/web/templates/layout/app.html.eex')
+
+    3. in your 'layout' template ('/lib/#{app_name}/web/templates/layout/app.html.eex')
     add the following to embed the elm-runtime (above 'app.js')
 
 
         <script src="<%= static_path(@conn, "/js/elm.js") %>"></script>
 
 
-    in your app.js file add the following
+    4. in your app.js file add the following
 
 
         import elmEmbed from './elm-embed.js'
@@ -40,7 +42,7 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
         elmEmbed.init()
 
 
-    and finally in your 'router.ex' file add
+    5. and finally in your 'router.ex' file add
 
 
         get "/", ElmController, :index
