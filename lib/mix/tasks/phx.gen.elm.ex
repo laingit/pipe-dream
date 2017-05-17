@@ -2,15 +2,14 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
   use Mix.Task
   import Mix.Generator
 
-  def run(argv) do
-    copy_phoenix_files(argv)
+  def run(_argv) do
+    copy_phoenix_files()
     copy_elm_files()
     install_node_modules()
-    post_install_instructions(argv)
+    post_install_instructions()
   end
 
-  def post_install_instructions(argv) do
-    app_name = argv |> parse_app_name()
+  def post_install_instructions() do
     instructions = """
 
     🎉 ✨  Your elm app is almost ready to go! ✨ 🎉
@@ -48,29 +47,10 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
     Mix.shell.info(instructions)
   end
 
-  def parse_app_name([]), do: raise "Please enter your app name as an atom, eg: mix phx.gen.elm :your_app"
-  def parse_app_name([argv]) do
-    if String.starts_with?(argv, ":") do
-      {_, app_name} = String.split_at(argv, 1)
-      app_name
-    else
-      raise "Invalid app name, please enter your app name as an atom"
-    end
-  end
 
-  def app_module_name(argv) do
-    argv
-    |> parse_app_name()
-    |> String.split("_")
-    |> Enum.map(&String.capitalize/1)
-    |> Enum.join("")
-  end
-
-  def copy_phoenix_files(argv) do
-    app_name = argv |> parse_app_name()
-
+  def copy_phoenix_files do
     src = "./priv/templates/phx.gen.elm"
-    destination = "./lib/#{app_name}/web"
+    destination = Mix.Phoenix.web_prefix()
 
     static_files = [
       "templates/elm/index.html.eex"
@@ -83,11 +63,11 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
 
     Mix.shell.info("adding phoenix files 🕊 🔥")
     copy_files(static_files, src, destination)
-    copy_templates(templates, src, destination, argv)
+    copy_templates(templates, src, destination)
   end
 
-  def add_app_name(file, argv) do
-    app = app_module_name(argv)
+  def add_app_name(file) do
+    app = app_module_name()
     EEx.eval_string(file, assigns: [app_name: app])
   end
 
@@ -108,9 +88,9 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
     copy_files(files, src, destination)
   end
 
-  def copy_templates(template_paths, src_path, destination, argv) do
+  def copy_templates(template_paths, src_path, destination) do
     template_paths
-    |> Enum.map(fn(x) -> { Path.join(destination, x), File.read!(Path.join(src_path, x)) |> add_app_name(argv) } end)
+    |> Enum.map(fn(x) -> { Path.join(destination, x), File.read!(Path.join(src_path, x)) |> add_app_name() } end)
     |> Enum.map(fn({ dest, file }) -> create_file(dest, file) end)
   end
 
@@ -118,6 +98,14 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
     file_paths
     |> Enum.map(fn(x) -> { Path.join(destination, x), File.read!(Path.join(src_path, x)) } end)
     |> Enum.map(fn({ dest, file }) -> create_file(dest, file) end)
+  end
+
+  def app_module_name do
+    Mix.Phoenix.otp_app()
+    |> Atom.to_string
+    |> String.split("_")
+    |> Enum.map(&String.capitalize/1)
+    |> Enum.join("")
   end
 
   def install_node_modules do
