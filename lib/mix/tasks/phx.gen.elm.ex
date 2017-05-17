@@ -4,15 +4,17 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
 
   @shortdoc "Generates an elm app with all the necessary scaffolding"
 
+  @src "priv/templates/phx.gen.elm"
+
   def run(_argv) do
     copy_phoenix_files()
     copy_elm_files()
-    copy_elm_test_files()
     install_node_modules()
     post_install_instructions()
+    update_time_created()
   end
 
-  def post_install_instructions() do
+  defp post_install_instructions do
     instructions = """
 
     🎉 ✨  Your elm app is almost ready to go! ✨ 🎉
@@ -51,77 +53,59 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
   end
 
 
-  def copy_phoenix_files do
-    src = "./priv/templates/phx.gen.elm"
-    destination = Mix.Phoenix.web_prefix()
-
-    static_files = [
-      "templates/elm/index.html.eex"
-    ]
-
+  defp copy_phoenix_files do
     templates = [
-      "views/elm_view.ex",
-      "controllers/elm_controller.ex",
+      {:eex, "views/elm_view.ex",             web_dir("views/elm_view.ex")},
+      {:eex, "controllers/elm_controller.ex", web_dir("controllers/elm_controller.ex")},
+      {:text, "templates/elm/index.html.eex", web_dir("templates/elm/index.html.eex")}
     ]
 
     Mix.shell.info("adding phoenix files 🕊 🔥")
-    copy_files(static_files, src, destination)
-    copy_templates(templates, src, destination)
+    copy_files(templates)
   end
 
-  def add_app_name(file) do
-    app = app_module_name()
-    EEx.eval_string(file, assigns: [app_name: app])
-  end
-
-  def copy_elm_files do
-    src = "./priv/templates/phx.gen.elm/assets"
-    destination = "./assets"
-
-    files = [
-      "elm/Main.elm",
-      "elm/Update.elm",
-      "elm/View.elm",
-      "elm/Model.elm",
-      "js/elm-embed.js",
-      "elm-package.json"
+  defp update_time_created do
+    [
+      web_dir("views/elm_view.ex"),
+      web_dir("controllers/elm_controller.ex")
     ]
+    |> Enum.map(&File.touch!(&1))
+  end
+
+  defp web_dir(path) do
+    web_path = Mix.Phoenix.web_prefix()
+    Path.join(web_path, path)
+  end
+
+  defp copy_files(templates) do
+    Mix.Phoenix.copy_from(
+      [Mix.Phoenix.otp_app()], @src, "", [app_name: app_module_name()], templates
+    )
+  end
+
+  defp copy_elm_files do
+    files = [
+      "assets/elm/Main.elm",
+      "assets/elm/Update.elm",
+      "assets/elm/View.elm",
+      "assets/elm/Model.elm",
+      "assets/js/elm-embed.js",
+      "assets/elm-package.json",
+      "test/elm/Main.elm",
+      "test/elm/Sample.elm",
+      "test/elm/elm-package.json"
+    ]
+    |> Enum.map(&text_file/1)
 
     Mix.shell.info("adding elm files 🌳")
-    copy_files(files, src, destination)
+    copy_files(files)
   end
 
-  def copy_elm_test_files do
-    src = "./priv/templates/phx.gen.elm/test"
-    destination = "./test"
-
-    files = [
-      "elm/Main.elm",
-      "elm/Sample.elm",
-      "elm/elm-package.json"
-    ]
-
-    copy_files(files, src, destination)
+  defp text_file(path) do
+    {:text, path, path}
   end
 
-  def copy_templates(template_paths, src_path, destination) do
-    template_paths
-    |> Enum.map(fn(x) -> { Path.join(destination, x), File.read!(Path.join(src_path, x)) |> add_app_name() } end)
-    |> Enum.map(&create_template/1)
-  end
-
-  defp create_template({ dest, file }) do
-    create_file(dest, file)
-    File.touch!(dest, :calendar.local_time())
-  end
-
-  def copy_files(file_paths, src_path, destination) do
-    file_paths
-    |> Enum.map(fn(x) -> { Path.join(destination, x), File.read!(Path.join(src_path, x)) } end)
-    |> Enum.map(fn({ dest, file }) -> create_file(dest, file) end)
-  end
-
-  def app_module_name do
+  defp app_module_name do
     Mix.Phoenix.otp_app()
     |> Atom.to_string
     |> String.split("_")
@@ -129,7 +113,7 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
     |> Enum.join("")
   end
 
-  def install_node_modules do
+  defp install_node_modules do
     deps = [
       "elm"
     ]
