@@ -2,6 +2,8 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
   use Mix.Task
   import Mix.Generator
 
+  @shortdoc "Generates an elm app with all the necessary scaffolding"
+
   def run(_argv) do
     copy_phoenix_files()
     copy_elm_files()
