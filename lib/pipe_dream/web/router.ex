@@ -15,6 +15,8 @@ defmodule PipeDream.Web.Router do
 
   scope "/", PipeDream.Web do
     pipe_through :browser # Use the default browser stack
+
+    get "/", PageController, :index
   end
 
   # Other scopes may use custom stacks.
