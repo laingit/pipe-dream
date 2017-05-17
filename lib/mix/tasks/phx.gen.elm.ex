@@ -7,6 +7,7 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
   def run(_argv) do
     copy_phoenix_files()
     copy_elm_files()
+    copy_elm_test_files()
     install_node_modules()
     post_install_instructions()
   end
@@ -90,10 +91,28 @@ defmodule Mix.Tasks.Phx.Gen.Elm do
     copy_files(files, src, destination)
   end
 
+  def copy_elm_test_files do
+    src = "./priv/templates/phx.gen.elm/test"
+    destination = "./test"
+
+    files = [
+      "elm/Main.elm",
+      "elm/Sample.elm",
+      "elm/elm-package.json"
+    ]
+
+    copy_files(files, src, destination)
+  end
+
   def copy_templates(template_paths, src_path, destination) do
     template_paths
     |> Enum.map(fn(x) -> { Path.join(destination, x), File.read!(Path.join(src_path, x)) |> add_app_name() } end)
-    |> Enum.map(fn({ dest, file }) -> create_file(dest, file) end)
+    |> Enum.map(&create_template/1)
+  end
+
+  defp create_template({ dest, file }) do
+    create_file(dest, file)
+    File.touch!(dest, :calendar.local_time())
   end
 
   def copy_files(file_paths, src_path, destination) do
