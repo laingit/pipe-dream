@@ -41,8 +41,7 @@ exports.config = {
     watched: [
       "static",
       "css",
-      "js",
-      "elm"
+      "js"
     ],
     // Where to compile files to
     public: "../priv/static"
@@ -62,12 +61,6 @@ exports.config = {
         require('postcss-custom-media')(),
         require('postcss-custom-properties')()
       ]
-    },
-
-    elmBrunch: {
-      mainModules: ['./elm/Main.elm'],
-      outputFile: 'elm.js',
-      makeParameters: ['--debug']
     }
   },
 

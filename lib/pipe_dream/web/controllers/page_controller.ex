@@ -1,4 +1,4 @@
-defmodule PipeDream.Web.ElmController do
+defmodule PipeDream.Web.PageController do
   use PipeDream.Web, :controller
 
   def index(conn, _params) do
